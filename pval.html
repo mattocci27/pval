@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>P-value and cross-validation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Masatoshi Katabuchi" />
+    <meta name="date" content="2020-09-29" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="fc2.css" type="text/css" />
+    <link rel="stylesheet" href="fc2-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# P-value and cross-validation
+### Masatoshi Katabuchi
+### September 29, 2020
+
+---
+
+
+
+
+
+
+
+
+# Assuming that
+
+- Your experimental design is solid.
+- Your measurement is biologically meaningful and shows greater variance than the measurement
+  errors.  
+- You know a theory or logic behind the patterns you observed. 
+
+---
+
+class: center, middle
+
+# Problems of p-values in liner and non-linear models
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+class: center, middle
+
+# P-values sometimes get very small when there is no meaningfull pattern  
+
+
+
+&lt;img src="images/summay_plt.png" alt="drawing" width="450"/&gt;
+
+---
+
+# D. Large sample size with no clear pattern
+
+.pull-left-40[
+![](pval_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+]
+
+.small[
+.pull-right-60[
+
+```
+## 
+## Call:
+## lm(formula = y ~ x + I(x^2), data = dat4)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -24.010  -6.456   0.004   6.009  32.078 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -1.2873     0.7917  -1.626 0.105535    
+## x             1.9848     0.6677   2.973 0.003320 ** 
+## I(x^2)       -1.4718     0.4316  -3.410 0.000788 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 9.355 on 197 degrees of freedom
+## Multiple R-squared:  0.08195,	Adjusted R-squared:  0.07263 
+## F-statistic: 8.792 on 2 and 197 DF,  p-value: 0.0002201
+```
+]]
+
+---
+
+class: center, middle
+
+# One solution: Cross-validation
+
+---
+
+## Idea
+
+Estimating how accurately a model can predict a new data set.
+
+.pull-left-50[
+![](pval_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+
+
+
+.small[
+.pull-right-50[
+
+1. Use subset of the data (e.g., 10 %) to make a regression line (blue points, solid line)
+2. Quantify how much this blue line can predict the data that were not used to
+   make the model (red points). For example, we can calculate `\(r^2\)`.
+3. Repeat 1-2 until you evaluate all the data. 
+4. Finally, calculate the mean of the each `\(r^2\)` (cross-validated `\(r^2\)`)
+- In this example, each `\(r^2\)` = -0.08, -0.05, -0.2, -0.12, -0.1, -0.09, 0.07, -0.04, 0.18, 0.12
+- `\(r_{CV}^2\)` = -0.04
+- When the model is very bad, `\(r^2\)` can be negative.
+]]
+
+---
+
+Small sample size is a problem too.
+
+.pull-left-50[
+![](pval_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+
+.small[
+.pull-right-50[
+ - Based on 10-folds cross-validation, `\(r_{CV}^2\)` = 0.08, which is much smaller than `\(r^2\)` = 0.76
+- If we use a liner model, `\(r_{CV}^2\)` = 0.37
+- A linear regression is more meaningfull or useful than a quadratic
+  regression in this example.
+- Reporting validate 
+]]
+
+---
+
+# Conclusion
+
+- Reporting *P*-value alone is a problem.
+- Presenting indices that assess the quality of predictors (e.g., `\(r 2\)`) is more kind for readers.
+- Draw plots when you can.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<script>
+(function() {
+  var divHTML = document.querySelectorAll(".details-open");
+  divHTML.forEach(function (el) {
+    var preNodes = el.getElementsByTagName("pre");
+    var outputNode = preNodes[1];
+    outputNode.outerHTML = "<details open class='output'><summary>Output</summary>" + outputNode.outerHTML + "</details>";
+  })
+})();
+(function() {
+  var divHTML = document.querySelectorAll(".details");
+  divHTML.forEach(function (el) {
+    var preNodes = el.getElementsByTagName("pre");
+    var outputNode = preNodes[1];
+    outputNode.outerHTML = "<details class='output'><summary>Output</summary>" + outputNode.outerHTML + "</details>";
+  })
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

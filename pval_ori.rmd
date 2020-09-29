@@ -1,0 +1,274 @@
+---
+title: P-value and cross-validation
+author: Masatoshi Katabuchi
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  xaringan::moon_reader:
+   #css: ["default", "rladies", "rladies-fonts.css"]
+   #css: ["default", "robot", "robot-fonts"]
+   #css: ["default", "lucy", "lucy-fonts"]
+    css: ["default", "fc2.css", "fc2-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    includes:
+      after_body: "collapseoutput.js"
+  html_document:
+    fig_caption: yes
+    theme: spacelab #readable #sandstone #spacelab #flatly
+    highlight: pygments #tango #kate
+    toc: TRUE
+    toc_depth: 2
+    number_sections: TRUE
+    toc_float:
+      collapsed: TRUE
+      smooth_scroll: TRUE
+      toc: true
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+#htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, dpi=200)
+```
+
+class: center, middle
+
+# Problems of p-values in liner models
+
+---
+
+# *r* = 0.6 with small sample size
+
+```{r}
+library(tidyverse)
+library(mvtnorm)
+theme_set(theme_bw())
+
+set.seed(123)
+N1 <- 20
+N2 <- 10000
+rho <- 0.6
+sig1 <- 1
+sig2 <- 1
+
+
+S <- matrix(c(sig1^2, rho*sig1*sig2, 
+              rho*sig1*sig2, sig2^2), ncol = 2)
+
+xy1 <- rmvnorm(N1, c(0, 0), S)
+xy2 <- rmvnorm(N2, c(0, 0), S)
+colnames(xy1) <-  colnames(xy2) <- c("x", "y")
+
+dat1 <- as_tibble(xy1)
+dat2 <- as_tibble(xy2)
+```
+
+```{r}
+rho_est <- cor.test(dat1$x, dat1$y)$estimate %>% round(2)
+p_est <- cor.test(dat1$x, dat1$y)$p.value 
+
+p_est_fun <- function(p_est) {
+  if (p_est < 0.001) {
+    p_est <- "p < 0.001"
+  } else if (p_est < 0.01) {
+    p_est <- "p < 0.01"
+  } else if (p_est < 0.05) {
+    p_est <- "p < 0.05"
+  } else {
+    p_est <- paste("p = ", p_est %>% round(2))
+  }
+  p_est
+}
+```
+
+.pull-left-40[
+
+```{r, fig.width = 4, fig.height = 3.5}
+p1 <- ggplot(dat1, aes(x = x, y = y)) +
+  geom_point(alpha = 0.8) +
+  ggtitle(paste0("N = 20,", " r = ", rho_est, ", ", p_est_fun(p_est)))
+
+p1
+```
+]
+
+
+.small[
+.pull-right-60[
+
+```{r}
+lm(y ~ x, dat1) %>%
+  summary
+```
+]
+]
+
+---
+
+# *r* = 0.6 with large sample size
+
+.pull-left-40[
+```{r, fig.width = 4, fig.height = 3.5}
+rho_est2 <- cor.test(dat2$x, dat2$y)$estimate %>% round(2)
+p_est2 <- cor.test(dat2$x, dat2$y)$p.value
+
+p2 <- ggplot(dat2, aes(x = x, y = y)) +
+  geom_point(alpha = 0.2) +
+  ggtitle(paste0("N = 10,000,", " r = ", rho_est2, ", ", p_est_fun(p_est2)))
+
+p2
+```
+]
+
+.small[
+.pull-right-60[
+```{r}
+lm(y ~ x, dat2) %>%
+  summary
+```
+]
+]
+
+---
+
+# *r* = 0.1 with small sample size
+
+```{r}
+rho <- 0.1
+
+S <- matrix(c(sig1^2, rho*sig1*sig2, 
+              rho*sig1*sig2, sig2^2), ncol = 2)
+
+xy1 <- rmvnorm(N1, c(0, 0), S)
+xy2 <- rmvnorm(N2, c(0, 0), S)
+colnames(xy1) <-  colnames(xy2) <- c("x", "y")
+
+dat3 <- as_tibble(xy1)
+dat4 <- as_tibble(xy2)
+
+```
+
+
+.pull-left-40[
+```{r}
+rho_est3 <- cor.test(dat3$x, dat3$y)$estimate %>% round(2)
+p_est3 <- cor.test(dat3$x, dat3$y)$p.value
+
+p3 <- ggplot(dat3, aes(x = x, y = y)) +
+  geom_point(alpha = 0.8) +
+  ggtitle(paste0("N = 20,", " r = ", rho_est3, ", ", p_est_fun(p_est3)))
+p3
+```
+]
+
+.small[
+.pull-right-60[
+```{r}
+lm(y ~ x, dat3) %>%
+  summary
+```
+]]
+
+---
+
+# *r* = 0.1 with large sample size
+
+.pull-left-40[
+```{r}
+rho_est4 <- cor.test(dat4$x, dat4$y)$estimate %>% round(2)
+p_est4 <- cor.test(dat4$x, dat4$y)$p.value
+
+p4 <- ggplot(dat4, aes(x = x, y = y)) +
+  geom_point(alpha = 0.3) +
+  ggtitle(paste0("N = 10,000,", " r = ", rho_est4, ", ", p_est_fun(p_est4)))
+p4
+```
+]
+
+.small[
+.pull-right-60[
+```{r}
+lm(y ~ x, dat4) %>%
+  summary
+```
+]]
+
+
+---
+
+class: center, middle
+
+# Summary
+
+```{r, fig.width = 8, fig.height = 8, dpi=200}
+p <- ggpubr::ggarrange(p1, p2, p3, p4, ncol = 2, nrow = 2, labels = LETTERS[1:4])
+ggsave("images/summay_plt.png", p)
+```
+
+<img src="images/summay_plt.png" alt="drawing" width="450"/>
+
+---
+
+
+class: center, middle
+
+# Cross-validation
+
+---
+
+## Idea
+
+```{r, fig.width = 4, fig.height = 3.5}
+dat2 <- dat2 %>%
+  mutate(test = sample(c(rep("train", 9000), rep("test", 1000))))
+
+train2 <- dat2 %>%
+  filter(test == "train")
+
+test2 <- dat2 %>%
+  filter(test == "test")
+
+fit2 <- lm(y ~ x, train2)
+fit2_all <- lm(y ~ x, dat2)
+
+ggplot(dat2, aes(x = x, y = y, col = test)) +
+  geom_point(alpha = 0.8) +
+  geom_abline(slope = fit2$coefficients[2], intercept = fit2$coefficients[1], 
+              col = "grey20") +
+  geom_abline(slope = fit2_all$coefficients[2], intercept = fit2_all$coefficients[1], 
+              col = "grey20", lty = 2) +
+  ggtitle(paste0("N = 10,000,", " r = ", rho_est, ", ", p_est_fun(p_est)))
+
+```
+
+---
+
+```{r, fig.width = 4, fig.height = 3.5}
+dat4 <- dat4 %>%
+  mutate(test = sample(c(rep("train", 9000), rep("test", 1000))))
+
+train4 <- dat4 %>%
+  filter(test == "train")
+
+test4 <- dat4 %>%
+  filter(test == "test")
+
+fit4 <- lm(y ~ x, train4)
+fit4_all <- lm(y ~ x, dat4)
+
+ggplot(dat4, aes(x = x, y = y, col = test)) +
+  geom_point(alpha = 0.8) +
+  geom_abline(slope = fit4$coefficients[2], intercept = fit4$coefficients[1], 
+              col = "grey20") +
+  geom_abline(slope = fit2_all$coefficients[2], intercept = fit2_all$coefficients[1], 
+              col = "grey20", lty = 2) +
+  ggtitle(paste0("N = 10,000,", " r = ", rho_est, ", ", p_est_fun(p_est)))
+
+```
