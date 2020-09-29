@@ -1,5 +1,5 @@
 ---
-title: P-value and cross-validation
+title: P-value and/or cross-validation
 author: Masatoshi Katabuchi
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -45,6 +45,10 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, dpi=200)
 - Your measurement is biologically meaningful and shows greater variance than the measurement
   errors.  
 - You know a theory or logic behind the patterns you observed. 
+
+
+![link](images/QR.png)
+Link to the slide.
 
 ---
 
@@ -291,7 +295,7 @@ cv_lm <- function(data, fit, K){
 .small[
 .pull-right-50[
 
-1. Use subset of the data (e.g., 10 %) to make a regression line (blue points, solid line)
+1. Use subset of the data (e.g., 90 %) to make a regression line (blue points, solid line)
 2. Quantify how much this blue line can predict the data that were not used to
    make the model (red points). For example, we can calculate $r^2$.
 3. Repeat 1-2 until you evaluate all the data. 
@@ -342,7 +346,8 @@ ggplot(dat1) +
 - If we use a liner model, $r_{CV}^2$ = `r cv_lm(dat1, fit1_lm, K = 10)[[2]] %>% round(2)`
 - A linear regression is more meaningfull or useful than a quadratic
   regression in this example.
-- Reporting validate 
+- Reporting $r_{CV}^2$ (and a figure) is more fair than reporting *P*-value alone
+  and a table.
 ]]
 
 ---
@@ -351,4 +356,9 @@ ggplot(dat1) +
 
 - Reporting *P*-value alone is a problem.
 - Presenting indices that assess the quality of predictors (e.g., $r 2$) is more kind for readers.
-- Draw plots when you can.
+- Model validation is important, especially when the model is complicated 
+    - Multiple regressions 
+    - General additive models...
+- Draw plots when it's possible
+- Example for cross-validation:
+   - Katabuchi, M., S. J. Wright, N. G. Swenson, K. J. Feeley, R. Condit, S. P. Hubbell, and S. J. Davies. 2017. Contrasting outcomes of species- and community-level analyses of the temporal consistency of functional composition. Ecology 98:2273–2280.[https://doi.org/10.1002/ecy.1952](https://doi.org/10.1002/ecy.1952)
