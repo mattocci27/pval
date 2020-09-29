@@ -24,7 +24,7 @@ output:
     number_sections: TRUE
     toc_float:
       collapsed: TRUE
-      smooth_scroll: TRUE
+      smooth_scroll: TRUE.
       toc: true
 ---
 
@@ -56,7 +56,7 @@ Link to the slide.
 
 class: center, middle
 
-# Problems of p-values in liner and non-linear models
+# Problems of p-values in linear and non-linear models
 
 
 ```{r}
