@@ -50,6 +50,8 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, dpi=200)
 ![link](images/QR.png)
 Link to the slide.
 
+- Code of this slide [https://github.com/mattocci27/pval](https://github.com/mattocci27/pval)
+
 ---
 
 class: center, middle
@@ -362,3 +364,4 @@ ggplot(dat1) +
 - Draw plots when it's possible
 - Example for cross-validation:
    - Katabuchi, M., S. J. Wright, N. G. Swenson, K. J. Feeley, R. Condit, S. P. Hubbell, and S. J. Davies. 2017. Contrasting outcomes of species- and community-level analyses of the temporal consistency of functional composition. Ecology 98:2273–2280.[https://doi.org/10.1002/ecy.1952](https://doi.org/10.1002/ecy.1952)
+
